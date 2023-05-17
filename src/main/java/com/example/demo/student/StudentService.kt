@@ -1,65 +1,49 @@
-package com.example.demo.student;
+package com.example.demo.student
 
-
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Optional;
-
+import jakarta.transaction.Transactional
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 
 @Service
-public class StudentService {
-
-    private StudentRepository studentRepository;
-
-    @Autowired
-    public StudentService(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
+class StudentService @Autowired constructor(private val studentRepository: StudentRepository) {
+    fun getStudents(): MutableList<Student> {
+        return studentRepository.findAll()
     }
 
-
-
-    public List<Student> getStudents(){
-        return studentRepository.findAll();
-    }
-
-
-    public void addNewStudent(Student student) {
-        Optional<Student> checkedStudent = studentRepository.checkForStudent(student.getEmail());
-        if (checkedStudent.isPresent()){
-            throw new IllegalStateException("email already registered");
+    fun addNewStudent(student: Student) {
+        val checkedStudent = studentRepository.checkForStudent(student.email)
+        if (checkedStudent.isPresent) {
+            throw IllegalStateException("email already registered")
+        }else {
+            studentRepository.save(student)
         }
-        studentRepository.save(student);
     }
 
-    public void deleteStudent(Long studentId) {
-        boolean exists = studentRepository.existsById(studentId);
-        if (!exists){
-            throw new IllegalStateException("student with id "+ studentId + " does not exist");
+    fun deleteStudent(studentId: Long) {
+        val exists = studentRepository.existsById(studentId)
+        if(!exists) {
+            throw java.lang.IllegalStateException("student with id $studentId does not exist")
+        }else{
+            studentRepository.deleteById(studentId)
         }
-        studentRepository.deleteById(studentId);
-
     }
 
     @Transactional
-    public void updateStudent(Long studentId, String name, String email) {
-        boolean exists = studentRepository.existsById(studentId);
-        Optional<Student> student = studentRepository.findById(studentId);
-        if (!student.isPresent()){
-                throw new IllegalStateException("student with id "+ studentId + " does not exist");
-        }
-        if (name!=null && !name.equals(student.get().getName())){
-            student.get().setName(name);
-        }
-        if (email!=null && !email.equals(student.get().getEmail())){
-            Optional<Student> checkedStudent = studentRepository.checkForStudent(email);
-            if (checkedStudent.isPresent()){
-                throw new IllegalStateException("email already registered");
+    fun updateStudent(studentId: Long, name: String?, email: String?) {
+        val student = studentRepository.findById(studentId)
+        if (!student.isPresent) {
+            throw java.lang.IllegalStateException("student with id $studentId does not exist")
+        }else { //if student exists
+            if (name != null && name != student.get().name) {
+                student.get().name = name
             }
-            student.get().setEmail(email);
+            if (email != null && email != student.get().email) {
+                val checkedStudent = studentRepository.checkForStudent(email)
+                if (!checkedStudent.isPresent) {
+                    throw java.lang.IllegalStateException("email $email already registered")
+                }
+                student.get().email = email
+            }
         }
-
-
     }
 }
