@@ -11,7 +11,6 @@ class Student {
     @SequenceGenerator(name = "student_sequence", sequenceName = "student_sequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_sequence")
     var id: Long? = null
-
     var name: String? = null
     var email: String? = null
     var dob: LocalDate? = null

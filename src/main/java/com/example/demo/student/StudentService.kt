@@ -3,6 +3,7 @@ package com.example.demo.student
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.util.Optional
 
 @Service
 open class StudentService @Autowired constructor(private val studentRepository: StudentRepository) {
@@ -10,7 +11,7 @@ open class StudentService @Autowired constructor(private val studentRepository: 
         get() = studentRepository.findAll()
 
     fun addNewStudent(student: Student) {
-        val checkedStudent = studentRepository.checkForStudent(student.email)
+        val checkedStudent:Optional<Student> = studentRepository.checkForStudent(student.email)
         check(!checkedStudent.isPresent) { "email already registered" }
         studentRepository.save(student)
     }
