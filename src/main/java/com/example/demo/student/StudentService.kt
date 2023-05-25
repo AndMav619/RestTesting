@@ -10,20 +10,20 @@ open class StudentService @Autowired constructor(private val studentRepository: 
     open val students: List<Student>
         get() = studentRepository.findAll()
 
-    fun addNewStudent(student: Student) {
+    open fun addNewStudent(student: Student) {
         val checkedStudent:Optional<Student> = studentRepository.checkForStudent(student.email)
         check(!checkedStudent.isPresent) { "email already registered" }
         studentRepository.save(student)
     }
 
-    fun deleteStudent(studentId: Long) {
+    open fun deleteStudent(studentId: Long) {
         val exists = studentRepository.existsById(studentId)
         check(exists) { "student with id $studentId does not exist" }
         studentRepository.deleteById(studentId)
     }
 
     @Transactional
-    fun updateStudent(studentId: Long, name: String?, email: String?) {
+    open fun updateStudent(studentId: Long, name: String?, email: String?) {
         val student = studentRepository.findById(studentId)
         check(student.isPresent) { "student with id $studentId does not exist" }
         if (name != null && name != student.get().name) {
